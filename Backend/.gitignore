@@ -1,0 +1,52 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+logs
+*.log
+*.log.*
+log/
+debug.log
+error.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Build output
+dist/
+build/
+.tmp/
+temp/
+.cache/
+
+# Environment variables
+.env
+.env.*     # e.g., .env.local, .env.production
+.env.*.local
+src/secrets/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/
+.idea/
+*.swp
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# PM2 logs / process dumps
+.pm2/
+
+# lock files if using only one package manager
+package-lock.json
