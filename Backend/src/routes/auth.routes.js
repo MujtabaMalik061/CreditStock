@@ -1,13 +1,23 @@
-import { Router } from 'express';
-import { rateLimit } from 'express-rate-limit';
-import { signUp, signIn, signOut, me } from '../controllers/auth.controller.js';
-import { requireAuth } from '../middlewares/auth.middleware.js';
-import { asyncRoute } from '../utils/http.js';
+import { Router } from "express";
+import { rateLimit } from "express-rate-limit";
+import { signUp, signIn, signOut, me } from "../controllers/auth.controller.js";
+import { requireAuth } from "../middlewares/auth.middleware.js";
+import { asyncRoute } from "../utils/http.js";
 const router = Router();
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-8', legacyHeaders: false, skipSuccessfulRequests: true, message: { message: 'Too many attempts. Please try again in 15 minutes.' } });
-router.use((_req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
-router.post('/signup', limiter, asyncRoute(signUp));
-router.post('/signin', limiter, asyncRoute(signIn));
-router.post('/signout', asyncRoute(signOut));
-router.get('/me', requireAuth, me);
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { message: "Too many attempts. Please try again in 15 minutes." },
+});
+router.use((_req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
+router.post("/signup", limiter, asyncRoute(signUp));
+router.post("/signin", limiter, asyncRoute(signIn));
+router.post("/signout", asyncRoute(signOut));
+router.get("/me", requireAuth, me);
 export default router;

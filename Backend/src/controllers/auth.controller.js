@@ -17,19 +17,17 @@ export async function signUp(req, res) {
     return res.status(400).json({ message: parsed.error.issues[0].message });
   const { name, shopName, email, password } = parsed.data;
   if (await User.exists({ email }))
-    return res
-      .status(409)
-      .json({
-        message: "An account with this email already exists. Please sign in.",
-      });
+    return res.status(409).json({
+      message: "An account with this email already exists. Please sign in.",
+    });
   const user = await User.create({
     name,
     shopName,
     email,
     passwordHash: await bcrypt.hash(password, 12),
   });
-  await createSession(user, req, res);
-  res.status(201).json({ user: publicUser(user) });
+  const token = await createSession(user, req, res);
+  res.status(201).json({ user: publicUser(user, token) });
 }
 export async function signIn(req, res) {
   const parsed = signInSchema.safeParse(req.body);
@@ -46,8 +44,8 @@ export async function signIn(req, res) {
   );
   if (!user || !valid)
     return res.status(401).json({ message: "Email or password is incorrect." });
-  await createSession(user, req, res);
-  res.json({ user: publicUser(user) });
+  const token = await createSession(user, req, res);
+  res.json({ user: publicUser(user, token) });
 }
 export async function signOut(req, res) {
   const token = req.cookies[cookieName];
@@ -56,5 +54,5 @@ export async function signOut(req, res) {
   res.json({ message: "Signed out successfully." });
 }
 export function me(req, res) {
-  res.json({ user: publicUser(req.user) });
+  res.json({ user: publicUser(req.user, req.cookies[cookieName]) });
 }

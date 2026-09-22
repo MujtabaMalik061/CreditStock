@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import mongoose from "mongoose";
 import connectToDB from "./database/mongodb.js";
-import { CLIENT_ORIGIN, PORT } from "./config/env.js";
+import { CLIENT_ORIGIN, PORT, NODE_ENV } from "./config/env.js";
 import productRoutes from "./routes/product.routes.js";
 import customerRoutes from "./routes/customer.routes.js";
 import transactionRoutes from "./routes/transaction.routes.js";
@@ -84,7 +84,7 @@ app.use((error, _req, res, next) => {
   console.error(error);
   res.status(500).json({ message: "Something went wrong on the server" });
 });
-if (process.env.NODE_ENV !== "test") {
+if (NODE_ENV !== "test") {
   await connectToDB()
     .then(() =>
       app.listen(PORT || 5000, () => console.log("CreditStock API ready")),
