@@ -85,7 +85,7 @@ app.use((error, _req, res, next) => {
   res.status(500).json({ message: "Something went wrong on the server" });
 });
 if (process.env.NODE_ENV !== "test") {
-  connectToDB()
+  await connectToDB()
     .then(() =>
       app.listen(PORT || 5000, () => console.log("CreditStock API ready")),
     )
