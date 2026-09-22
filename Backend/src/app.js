@@ -46,7 +46,7 @@ app.use("/api", (req, res, next) => {
   }
   next();
 });
-app.get("/api", (_req, res) =>
+app.get("/", (_req, res) =>
   res.json({
     status: "ok",
     database:
