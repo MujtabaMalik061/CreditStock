@@ -5,14 +5,14 @@ import Transaction from '../models/transaction.model.js';
 import { balances } from '../services/credit.service.js';
 import { asyncRoute } from '../utils/http.js';
 const router = Router();
-router.get('/', asyncRoute(async (_req, res) => {
+router.get('/', asyncRoute(async (req, res) => {
   const start = new Date(); start.setHours(0, 0, 0, 0);
   const weekStart = new Date(start); weekStart.setDate(weekStart.getDate() - 6);
   const [products, customerCount, due, sales] = await Promise.all([
-    Product.find().sort({ stock: 1 }).lean(),
-    Customer.countDocuments(),
-    balances(),
-    Transaction.find({ type: 'sale', createdAt: { $gte: weekStart } }).populate('product', 'name costPrice').lean()
+    Product.find({ owner: req.owner }).sort({ stock: 1 }).lean(),
+    Customer.countDocuments({ owner: req.owner }),
+    balances(req.owner),
+    Transaction.find({ owner: req.owner, type: 'sale', createdAt: { $gte: weekStart } }).populate('product', 'name costPrice').lean()
   ]);
   const days = Array.from({ length: 7 }, (_, index) => {
     const day = new Date(weekStart); day.setDate(day.getDate() + index);

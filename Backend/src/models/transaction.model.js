@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 const schema = new mongoose.Schema({
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   type: { type: String, enum: ['sale', 'payment', 'stock'], required: true },
   product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
   customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },

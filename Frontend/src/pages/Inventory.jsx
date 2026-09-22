@@ -8,7 +8,7 @@ export default function Inventory({ products, open }) {
   const low = products.filter(p => p.stock <= p.reorderLevel);
   const value = products.reduce((n, p) => n + p.stock * p.costPrice, 0);
   const rows = products.filter(p => (p.name + p.sku + p.category).toLowerCase().includes(search.toLowerCase()) && (filter === 'all' || (filter === 'low' ? p.stock <= p.reorderLevel : p.stock > p.reorderLevel)));
-  function exportRows() { downloadCsv('creditstock-products.csv', ['Name', 'SKU', 'Category', 'Selling price', 'Cost price', 'Stock', 'Reorder level'], products.map(p => [p.name, p.sku, p.category, p.sellingPrice, p.costPrice, p.stock, p.reorderLevel])); }
+  function exportRows() { downloadCsv('creditstock-products.csv', ['Name', 'SKU', 'Category', 'Selling price', 'Cost price', 'Stock', 'Reorder level'], rows.map(p => [p.name, p.sku, p.category, p.sellingPrice, p.costPrice, p.stock, p.reorderLevel])); }
   return <>
     <section className="page-intro"><div><span className="eyebrow">YOUR CATALOG</span><h2>Know what’s on every shelf.</h2><p>Keep products organized and catch low stock before it slows you down.</p></div><button className="btn primary" onClick={() => open({ type: 'product' })}><Icon name="plus" size={17}/> Add product</button></section>
     <section className="mini-metrics"><div><span className="mini-icon violet"><Icon name="inventory"/></span><div><small>Total products</small><strong>{products.length}</strong></div></div><div><span className="mini-icon orange"><Icon name="warning"/></span><div><small>Need restocking</small><strong>{low.length}</strong></div></div><div><span className="mini-icon blue"><Icon name="layers"/></span><div><small>Inventory cost value</small><strong>{money(value)}</strong></div></div></section>

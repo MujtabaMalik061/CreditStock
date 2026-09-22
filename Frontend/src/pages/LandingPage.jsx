@@ -1,9 +1,39 @@
-const LandingPage = () => {
-  return (
-    <div>
-      <h1>Welcome to Frontend.</h1>
-    </div>
-  );
-};
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import Icon from '../components/Icon.jsx';
 
-export default LandingPage;
+const features = [
+  { icon: 'inventory', label: '01 / INVENTORY', title: 'A little order for every shelf.', text: 'Keep products, prices, and stock levels together. Know what’s running low before the next customer asks.', detail: 'Product catalog · Stock movements · Reorder alerts' },
+  { icon: 'wallet', label: '02 / CUSTOMER CREDIT', title: 'Good relationships. Clear balances.', text: 'Give every customer a clear record. Track credit, record partial payments, and follow up with confidence.', detail: 'Customer ledger · Payment history · Reminders' },
+  { icon: 'reports', label: '03 / SALES & REPORTS', title: 'See the story behind your sales.', text: 'Connect every sale to your stock and understand how your shop is doing, without sorting through notebooks.', detail: 'Sales trends · Receipts · CSV exports' },
+];
+
+function ProductPreview() {
+  return <div className="product-preview" aria-label="Illustrative CreditStock dashboard with sample data">
+    <div className="preview-chrome"><span className="preview-dots"><i/><i/><i/></span><span>YOUR BUSINESS, IN FOCUS</span><span className="preview-sample">Sample workspace</span></div>
+    <div className="preview-body">
+      <aside className="preview-sidebar"><span className="preview-logo">c<span>↗</span></span>{['overview', 'inventory', 'customers', 'reports'].map((name, i) => <span key={name} className={i === 0 ? 'selected' : ''}><Icon name={name} size={19}/></span>)}<span className="preview-avatar">AS</span></aside>
+      <div className="preview-content"><div className="preview-heading"><div><span className="micro-label">MONDAY, A FRESH START</span><h3>Your shop at a glance.</h3></div><span className="preview-new"><Icon name="plus" size={13}/> New sale</span></div>
+        <div className="preview-metrics"><div><span>Today’s sales</span><strong><small>Rs.</small> 24,850</strong><em><Icon name="trend" size={12}/> 12 sales recorded</em></div><div><span>Customer credit</span><strong><small>Rs.</small> 8,400</strong><em className="neutral">Across 6 customers</em></div><div><span>Products in stock</span><strong>148<small> items</small></strong><em className="neutral">Everything in its place</em></div></div>
+        <div className="preview-panels"><div className="preview-chart"><div className="preview-panel-title"><strong>Sales overview</strong><span>This week ↗</span></div><strong className="preview-total">Rs. 128,450</strong><div className="preview-bars" role="img" aria-label="Illustrative weekly sales chart">{[38, 57, 44, 72, 61, 88, 76].map((height, i) => <div key={i}><span style={{ height: height + '%' }}/><small>{['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}</small></div>)}</div></div><div className="preview-stock"><div className="preview-panel-title"><strong>Stock watch</strong><Icon name="inventory" size={15}/></div>{[['BR', 'Basmati rice', '4 left'], ['CO', 'Cooking oil', '6 left'], ['BT', 'Black tea', '3 left']].map(([initials, name, stock]) => <div className="preview-stock-row" key={name}><span>{initials}</span><div><strong>{name}</strong><small>Ready for a restock</small></div><em>{stock}</em></div>)}<span className="preview-stock-note"><span className="live-dot"/> A clearer view. A calmer day.</span></div></div>
+      </div>
+    </div>
+    <div className="preview-caption"><span><Icon name="check" size={13}/> Stock, sales & credit. Connected.</span><span>Illustrative data</span></div>
+  </div>;
+}
+
+export default function LandingPage() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  return <div className="landing">
+    <a className="skip-link" href="#main-content">Skip to content</a>
+    <header className="landing-header"><Link to="/" className="wordmark" aria-label="CreditStock home"><span className="logo-mark">c<span>↗</span></span>CreditStock<span className="brand-period">.</span></Link><button className="landing-menu" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} aria-controls="landing-nav" onClick={() => setMenuOpen(!menuOpen)}><Icon name={menuOpen ? 'close' : 'menu'}/></button><nav id="landing-nav" className={menuOpen ? 'is-open' : ''} aria-label="Website navigation"><a href="#features" onClick={() => setMenuOpen(false)}>The essentials</a><a href="#how-it-works" onClick={() => setMenuOpen(false)}>How it works</a><Link to="/signin">Sign in</Link><Link className="landing-nav-cta" to="/signup">Get started <Icon name="arrow" size={16}/></Link></nav></header>
+    <main id="main-content">
+      <section className="landing-hero"><div className="hero-editorial"><span className="landing-eyebrow"><i/> LESS ADMIN. MORE BUSINESS.</span><h1>A clearer picture.<br/>A <em>better</em> business.</h1><p>Your stock, sales, and customer credit — beautifully<br className="desktop-break"/> in order. Meet a simpler way to run your shop.</p><div className="landing-actions"><Link to="/signup" className="landing-button">Create your workspace <Icon name="arrow" size={18}/></Link><a href="#features" className="landing-secondary">Explore CreditStock <span>↙</span></a></div><div className="hero-footnote"><span><Icon name="check" size={14}/> All your essentials, together</span><span className="footnote-divider"/><span>Built for everyday shopkeeping</span></div></div><div className="hero-margin-note"><span>THE EVERYDAY<br/>BUSINESS COMPANION</span><div/><span>STOCK. SELL. GROW.</span></div><div className="preview-stage"><div className="preview-accent"/><ProductPreview/><span className="preview-side-note">A little clarity goes a long way.</span></div></section>
+      <section className="essentials-strip" aria-label="Product capabilities"><span>ONE WORKSPACE.<br/><strong>Everything accounted for.</strong></span>{[['inventory', 'Stock that stays in sync'], ['receipt', 'Every sale, recorded'], ['wallet', 'Credit kept clear'], ['reports', 'Insights that make sense']].map(([icon, title]) => <div key={icon}><Icon name={icon}/><span>{title}</span></div>)}</section>
+      <section id="features" className="landing-section features-section"><div className="landing-section-heading"><div><span className="landing-eyebrow">THE ESSENTIALS, DONE WELL</span><h2>Less to keep in your head.<br/><em>More room to grow.</em></h2></div><p>From the first sale to the last balance,<br/>bring the moving parts of your shop together.</p></div><div className="feature-grid">{features.map(feature => <article className="feature-card" key={feature.icon}><span className="feature-icon"><Icon name={feature.icon} size={26}/></span><span className="micro-label">{feature.label}</span><h3>{feature.title}</h3><p>{feature.text}</p><div>{feature.detail}</div></article>)}</div></section>
+      <section id="how-it-works" className="workflow-section"><div className="workflow-intro"><span className="landing-eyebrow">A SIMPLE DAILY RHYTHM</span><h2>Made for the way<br/>your shop <em>works.</em></h2><p>A few small steps. A much clearer day.</p><Link to="/signup" className="landing-secondary">Let’s get to work <Icon name="arrow" size={18}/></Link></div><div className="workflow-steps">{[['01', 'Make yourself at home.', 'Add your products and customers to bring your shop into one organized workspace.'], ['02', 'Keep the day moving.', 'Record sales and payments as they happen. Your stock and customer balances stay connected.'], ['03', 'Close the day with clarity.', 'Review transactions, check what needs restocking, and see your sales at a glance.']].map(([number, title, text]) => <article key={number}><span>{number}</span><div><h3>{title}</h3><p>{text}</p></div></article>)}</div></section>
+      <section className="landing-final"><span className="landing-eyebrow">YOUR NEXT CHAPTER STARTS HERE</span><h2>Good business starts<br/>with a <em>clearer view.</em></h2><Link to="/signup" className="landing-button light">Create your workspace <Icon name="arrow" size={18}/></Link><span className="final-decoration" aria-hidden="true">c↗</span></section>
+    </main>
+    <footer className="landing-footer"><Link to="/" className="wordmark"><span className="logo-mark">c<span>↗</span></span>CreditStock.</Link><p>A little more organized. A lot more in control.</p><span>© {new Date().getFullYear()} CreditStock</span></footer>
+  </div>;
+}

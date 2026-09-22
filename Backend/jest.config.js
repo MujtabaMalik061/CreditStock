@@ -2,6 +2,7 @@ export default {
   testEnvironment: "node",
   transform: {},
   roots: ["<rootDir>/tests"],
-  moduleFileExtensions: ["js", "json"],
-  verbose: true,
+  setupFilesAfterEnv: ["<rootDir>/tests/jest.setup.js"],
+  testTimeout: 20000,
+  verbose: true
 };

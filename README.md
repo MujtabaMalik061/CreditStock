@@ -31,10 +31,32 @@ Use your own MongoDB connection if it is hosted elsewhere. Install dependencies 
 
     npm run local
 
-Open http://localhost:5173. Vite proxies /api to the backend on port 5000. For deployment, set VITE_API_URL for the frontend and CLIENT_ORIGIN for the backend.
+Open http://localhost:5173 for the landing page, or http://localhost:5173/app for the shop workspace. The landing page is available without a database connection; the workspace requires the backend. Vite proxies /api to the PORT configured in Backend/.env.development.local (falling back to 5000). For deployment, set VITE_API_URL for the frontend and CLIENT_ORIGIN for the backend.
 
 The backend connects to MongoDB before listening. An unreachable database prevents the API from starting.
 
 ## Scope
 
-This is a single-shop portfolio prototype. The profit figure is an estimate based on product cost at sale for new transactions; older transactions use current product cost where available. Receipts cover one product per sale. Authentication and database transactions should be added before storing real business data or allowing multiple users.
+This is a shop-management portfolio prototype with separate account workspaces. The profit figure is an estimate based on product cost at sale for new transactions; older transactions use current product cost where available. Receipts cover one product per sale. Email/password authentication and per-account data isolation are included. Database transactions should still be added for atomic stock/payment operations under concurrent writes.
+
+
+## Accounts
+
+- `/signup`: name, shop name, email, password, and password confirmation. Successful registration signs in automatically.
+- `/signin`: email/password login; signed-in visitors go to `/app`.
+- `/app`: protected workspace, account details, and sign-out.
+- API: `POST /api/auth/signup`, `POST /api/auth/signin`, `POST /api/auth/signout`, `GET /api/auth/me`.
+
+Passwords are bcrypt-hashed. Seven-day sessions use random opaque tokens in HTTP-only, SameSite=Lax cookies, with only token hashes stored in MongoDB. Logout revokes the current session. Production cookies require HTTPS. No JWT secret is needed. Login/registration failures are rate limited. Customer, product, transaction, and report queries are scoped to the authenticated account.
+
+Set `CLIENT_ORIGIN` to the exact frontend origin (or comma-separated allowed origins). For production, serve `/api` through the frontend origin or use an API on the same site, such as `app.example.com` and `api.example.com`. Unrelated frontend/API domains are intentionally unsupported by the SameSite cookie policy. If using a separate same-site API, set `VITE_API_URL` to its `/api` URL. Development uses the Vite `/api` proxy, which reads `PORT` from `Backend/.env.development.local` (default 5000). Set `API_PROXY_TARGET` in the frontend environment or shell to override the backend address. Restart Vite after changing the backend port.
+
+Legacy records without an owner remain in the database but are not exposed to new accounts. Assign their `owner` fields to the intended existing user only after verifying ownership; do not automatically give historical records to the first signup. On startup the old global SKU index is replaced with uniqueness per account, without deleting records.
+
+## Authentication tests
+
+Start a disposable local MongoDB instance, then run:
+
+    TEST_DB_URI=mongodb://127.0.0.1:27019 npm test --prefix Backend
+
+Tests use a unique temporary database and delete only that database afterward. They never use the application’s `DB_URI`. Coverage includes registration, password hashing, cookies, login, logout/session revocation, expiration, request-origin validation, rate limiting, and cross-account access attempts.
