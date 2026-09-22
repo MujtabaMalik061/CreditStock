@@ -11,4 +11,4 @@ dotenv.config({
     ".env." + (process.env.NODE_ENV || "development") + ".local",
   ),
 });
-export const { NODE_ENV, DB_URI, PORT } = process.env;
+export const { NODE_ENV, DB_URI, PORT, CLIENT_ORIGIN } = process.env;

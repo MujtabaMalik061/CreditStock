@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import mongoose from "mongoose";
 import connectToDB from "./database/mongodb.js";
-import { PORT } from "./config/env.js";
+import { CLIENT_ORIGIN, PORT } from "./config/env.js";
 import productRoutes from "./routes/product.routes.js";
 import customerRoutes from "./routes/customer.routes.js";
 import transactionRoutes from "./routes/transaction.routes.js";
@@ -15,11 +15,12 @@ import { requireAuth } from "./middlewares/auth.middleware.js";
 
 const app = express();
 const origins = (
-  process.env.CLIENT_ORIGIN ||
-  "http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174"
+  CLIENT_ORIGIN ||
+  "https://credit-stock.vercel.app,http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174"
 )
   .split(",")
-  .map((value) => value.trim());
+  .map((value) => value.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
 app.use(cors({ origin: origins, credentials: true }));
 app.use(morgan("dev"));
 app.use(express.json({ limit: "32kb" }));
@@ -31,7 +32,10 @@ app.use("/api", (req, res, next) => {
       return res
         .status(403)
         .json({ message: "Request origin is not allowed." });
-    if (req.get("sec-fetch-site") === "cross-site")
+    if (
+      req.get("sec-fetch-site") === "cross-site" &&
+      !origins.includes(req.get("origin"))
+    )
       return res
         .status(403)
         .json({ message: "Cross-site requests are not allowed." });
@@ -42,6 +46,13 @@ app.use("/api", (req, res, next) => {
   }
   next();
 });
+app.get("/api", (_req, res) =>
+  res.json({
+    status: "ok",
+    database:
+      mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+  }),
+);
 app.use("/api/auth", authRoutes);
 app.get("/api/health", (_req, res) =>
   res.json({
@@ -61,13 +72,11 @@ app.use((error, _req, res, next) => {
   if (error.name === "CastError")
     return res.status(400).json({ message: "Invalid record ID" });
   if (error.code === 11000)
-    return res
-      .status(409)
-      .json({
-        message: error.keyPattern?.email
-          ? "An account with this email already exists. Please sign in."
-          : "SKU already exists",
-      });
+    return res.status(409).json({
+      message: error.keyPattern?.email
+        ? "An account with this email already exists. Please sign in."
+        : "SKU already exists",
+    });
   if (error.type === "entity.parse.failed")
     return res.status(400).json({ message: "Invalid JSON body" });
   if (error.status === 413)

@@ -1,7 +1,8 @@
 import { randomBytes, createHash } from 'node:crypto';
 import Session from '../models/session.model.js';
 export const cookieName = 'creditstock_session';
-export const cookieOptions = { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' };
+const isProduction = process.env.NODE_ENV === 'production';
+export const cookieOptions = { httpOnly: true, secure: isProduction, sameSite: isProduction ? 'none' : 'lax', path: '/' };
 export const hashToken = token => createHash('sha256').update(token).digest('hex');
 export async function createSession(user, req, res) {
   const token = randomBytes(32).toString('hex');
