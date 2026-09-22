@@ -81,6 +81,17 @@ router.patch(
     res.json(item);
   }),
 );
+router.delete(
+  "/:id",
+  asyncRoute(async (req, res) => {
+    const item = await Product.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.owner,
+    });
+    if (!item) return fail(res, "Product not found", 404);
+    res.json({ message: "Product deleted successfully" });
+  }),
+);
 router.post(
   "/:id/stock",
   asyncRoute(async (req, res) => {
